@@ -180,14 +180,18 @@ class AkunController extends Controller
     public function toggleAktif(Request $request, $kode)
     {
         $akun = Akun::findOrFail($kode);
-        $akun->is_aktif = $akun->is_aktif ? 0 : 1;
-        $akun->id_status_data = $akun->is_aktif ? 1 : -1;
-        $akun->waktu_ubah = now();
-        $akun->save();
+        $newAktif = $akun->is_aktif == 1 ? 0 : 1;
+        $newStatus = $newAktif == 1 ? 1 : -1;
+
+        Akun::where('kode', $kode)->update([
+            'is_aktif'      => $newAktif,
+            'id_status_data' => $newStatus,
+            'waktu_ubah'    => now(),
+        ]);
 
         return response()->json([
             'success'  => true,
-            'is_aktif' => (bool) $akun->is_aktif,
+            'is_aktif' => $newAktif == 1,
         ]);
     }
 
@@ -209,11 +213,6 @@ class AkunController extends Controller
         $import = new AkunImport;
         Excel::import($import, $request->file('file'));
 
-        $msg = 'Import berhasil.';
-        if (!empty($import->errors)) {
-            $msg .= ' Catatan: '.implode(' ', $import->errors);
-        }
-
-        return redirect()->route('akun.index')->with('success', $msg);
+        return redirect()->route('akun.index')->with('success', 'Import berhasil.');
     }
 }

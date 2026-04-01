@@ -50,13 +50,13 @@
         <button @click="modalCreate = true" class="px-3 py-1.5 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 flex items-center gap-1">
             <i class="bi bi-plus-circle"></i>Buat Akun Baru
         </button>
-        <a href="{{ route('akun.template') }}" class="px-3 py-1.5 text-sm border border-gray-300 rounded hover:bg-gray-50 flex items-center gap-1 text-gray-700 no-underline">
+        <a href="{{ route('akun.template') }}" onclick="this.innerHTML='<span class=\'inline-block w-4 h-4 border-2 border-gray-500 border-t-transparent rounded-full animate-spin mr-1\'></span>Downloading...'; setTimeout(() => { this.innerHTML='<i class=\'bi bi-file-earmark-arrow-down\'></i>Download Template'; }, 3000)" class="px-3 py-1.5 text-sm border border-gray-300 rounded hover:bg-gray-50 flex items-center gap-1 text-gray-700 no-underline">
             <i class="bi bi-file-earmark-arrow-down"></i>Download Template
         </a>
         <button @click="modalImport = true" class="px-3 py-1.5 text-sm bg-yellow-500 text-white rounded hover:bg-yellow-600 flex items-center gap-1">
             <i class="bi bi-file-earmark-arrow-up"></i>Import Excel
         </button>
-        <a href="{{ route('akun.export') }}" class="px-3 py-1.5 text-sm bg-green-600 text-white rounded hover:bg-green-700 flex items-center gap-1 no-underline">
+        <a href="{{ route('akun.export') }}" onclick="this.innerHTML='<span class=\'inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-1\'></span>Exporting...'; setTimeout(() => { this.innerHTML='<i class=\'bi bi-file-earmark-excel\'></i>Export Excel'; }, 3000)" class="px-3 py-1.5 text-sm bg-green-600 text-white rounded hover:bg-green-700 flex items-center gap-1 no-underline">
             <i class="bi bi-file-earmark-excel"></i>Export Excel
         </a>
     </div>
@@ -81,7 +81,7 @@
                 @endforeach
             </select>
             <div class="flex gap-1">
-                <button type="submit" class="flex-1 px-3 py-1.5 text-sm bg-blue-600 text-white rounded hover:bg-blue-700">
+                <button type="submit" class="flex-1 px-3 py-1.5 text-sm bg-blue-600 text-white rounded hover:bg-blue-700" onclick="this.disabled=true;this.innerHTML='<span class=\'inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-1\'></span>Filtering...';this.closest('form').submit();">
                     <i class="bi bi-search"></i> Filter
                 </button>
                 <a href="{{ route('akun.index') }}" class="px-3 py-1.5 text-sm border border-gray-300 rounded hover:bg-gray-50 text-gray-700 no-underline">Reset</a>
@@ -312,35 +312,41 @@ function coaApp() {
             window.coaOpenEdit = (kode) => this.openEdit(kode);
             window.coaToggleRow = (kode) => this.toggleRow(kode);
 
-            // Toggle aktif handler
+            // Toggle aktif handler — prevent double binding
             document.querySelectorAll('.toggle-aktif').forEach(chk => {
+                if (chk.dataset.bound) return;
+                chk.dataset.bound = '1';
                 chk.addEventListener('change', (e) => this.handleToggle(e.target));
             });
         },
 
         handleToggle(cb) {
             const url = cb.dataset.url;
+            const wasChecked = !cb.checked; // browser already flipped it
             cb.disabled = true;
 
             fetch(url, {
-                method: 'POST',
+                method: 'PATCH',
                 headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content },
-                body: JSON.stringify({ _method: 'PATCH' }),
+                body: JSON.stringify({}),
             })
-            .then(r => r.json())
+            .then(r => {
+                if (!r.ok) throw new Error('HTTP ' + r.status);
+                return r.json();
+            })
             .then(data => {
                 cb.disabled = false;
                 if (data.success) {
-                    cb.checked = data.is_aktif;
                     window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Status berhasil disimpan', type: 'success' } }));
                 } else {
-                    cb.checked = !cb.checked;
+                    cb.checked = wasChecked;
                     window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Gagal menyimpan status', type: 'error' } }));
                 }
             })
-            .catch(() => {
+            .catch((err) => {
+                console.error('toggle error:', err);
                 cb.disabled = false;
-                cb.checked = !cb.checked;
+                cb.checked = wasChecked;
                 window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Koneksi gagal', type: 'error' } }));
             });
         },

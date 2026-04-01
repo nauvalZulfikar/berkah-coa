@@ -18,17 +18,17 @@
     <td class="px-3 py-2">
         <span class="inline-block px-2 py-0.5 text-xs rounded bg-gray-200 text-gray-700">{{ $akun->tipeAkun?->tipe_akun }}</span>
     </td>
-    <td class="px-3 py-2 text-center">
+    <td class="px-3 py-2 text-center" onclick="event.stopPropagation()">
         <div class="flex items-center justify-center gap-2">
             <input class="toggle-switch toggle-aktif" type="checkbox"
                 data-kode="{{ $akun->kode }}"
                 data-url="{{ route('akun.toggleAktif', $akun->kode) }}"
                 {{ $akun->is_aktif ? 'checked' : '' }}>
-            <button onclick="window.coaOpenDetail({{ $akun->kode }})"
+            <button onclick="event.stopPropagation(); window.coaOpenDetail({{ $akun->kode }})"
                 class="text-blue-500 hover:text-blue-700 p-1" title="Detail">
                 <i class="bi bi-eye"></i>
             </button>
-            <button onclick="window.coaOpenEdit({{ $akun->kode }})"
+            <button onclick="event.stopPropagation(); window.coaOpenEdit({{ $akun->kode }})"
                 class="text-gray-500 hover:text-indigo-600 p-1" title="Edit">
                 <i class="bi bi-pencil"></i>
             </button>

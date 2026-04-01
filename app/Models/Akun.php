@@ -19,7 +19,7 @@ class Akun extends Model
     ];
 
     protected $casts = [
-        'is_aktif' => 'boolean',
+        'is_aktif' => 'integer',
         'waktu_ubah' => 'datetime',
     ];
 

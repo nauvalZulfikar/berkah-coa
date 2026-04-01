@@ -20,8 +20,7 @@ class AkunImport implements ToCollection, WithHeadingRow
             $kodeIndukVal = trim($row['kode_induk'] ?? '');
             $tipeNama     = trim($row['tipe_akun'] ?? '');
 
-            if (!$kodeInternal || !$nama || !$tipeNama) {
-                $this->errors[] = "Baris ".($i+2).": kode, nama, atau tipe_akun kosong, dilewati.";
+            if (!$kodeInternal || !$nama || !$tipeNama || $tipeNama === '--pilih--') {
                 continue;
             }
 
