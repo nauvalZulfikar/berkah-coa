@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>BERKAH — Chart of Accounts</title>
+    <title>BERKAH TAF — @yield('page-title', 'Pajak, Akuntansi dan Keuangan')</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
@@ -20,10 +20,20 @@
 <nav class="bg-blue-600 text-white shadow">
     <div class="max-w-full mx-auto px-4 py-3 flex items-center">
         <a href="{{ route('akun.index') }}" class="font-bold text-lg tracking-wide flex items-center gap-2 text-white no-underline">
-            <i class="bi bi-diagram-3-fill"></i>BERKAH COA
+            <i class="bi bi-diagram-3-fill"></i>BERKAH TAF
         </a>
     </div>
 </nav>
+<div class="bg-white border-b shadow-sm">
+    <div class="max-w-full mx-auto px-4 flex items-center gap-1">
+        <a href="{{ route('akun.index') }}" class="px-3 py-2 text-sm no-underline flex items-center gap-1.5 border-b-2 transition-colors {{ request()->is('akun*') ? 'border-blue-600 text-blue-600 font-semibold' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
+            <i class="bi bi-diagram-3"></i>COA
+        </a>
+        <a href="{{ route('mutasi-bank.index') }}" class="px-3 py-2 text-sm no-underline flex items-center gap-1.5 border-b-2 transition-colors {{ request()->is('mutasi-bank*') ? 'border-blue-600 text-blue-600 font-semibold' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
+            <i class="bi bi-bank"></i>Mutasi Bank
+        </a>
+    </div>
+</div>
 
 <div class="px-3 md:px-6 py-4">
     @if(session('success'))
